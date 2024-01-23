@@ -61,5 +61,5 @@ function addTwoNumbers(l1, l2) {
 }
 
 /* This beats 19% on time and 5% on space so not ideal, but... I don't really see a way around it being O(n) in both time and space complexity so ehhh?
-I could have used the nullish coalescing operator instead of creating new variables for first and second but I really, really didn't want to see "null doesn't have this property". */
+I could have used the optional chaining ? instead of creating new variables for first and second but I really, really didn't want to see "null doesn't have this property". */
 
