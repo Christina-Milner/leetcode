@@ -61,3 +61,66 @@ const canSortArray = function(nums) {
 
 // Not quite as easy as I thought it was, but I did figure it out! And without having to actually do the sort, dear God.
 // That is enough for today, I suspect 4 of these in a row would be too much and I would not manage them in 1:30.
+
+// 3012 Minimize Length of Array Using Operations
+
+/* Given an array of positive integers, you are allowed to do this operation any number of times: select 2 indices of nonzero elements, insert the modulo of the two at the end of the array, delete the original elements
+ from it. 
+ Return the minimum length of nums.
+ Example: [1, 4, 3, 1] => [1, 4, 3, 1, 3] => [1, 1, 3] => [1, 1] => [0] => result is 1
+
+ [5, 5, 5, 10, 5] => [5, 5, 5, 10, 5, 5] => [5, 5, 5, 5] => [5, 5, 5, 5, 0] => [5, 5, 0] => [0, 0] => 2
+ 
+ */
+
+ //P: An array of numbers
+ //R: A number
+
+ /*
+- An array cannot be reduced further if it has fewer than 2 nonzero elements remaining, so, length 0, length 1, length 2 with one zero, or any length with all elements being zeroes
+- Given the length of the array goes up to 10 ** 5, I suspect performance will be an issue. Surely actually doing the swaps step by step is too inefficient.
+- But what if the modulo of idx 0 and 1 is the perfect partner for the next pairing? 
+- Iterate over it, keeping track of the indices we want to boot but also the modulos that are going to get added, and check those as you go
+- Keep doing this with a "only divisions that don't result in a remainder of 0" criteria until you get a loop with no swaps, then allow any divisions for further simplification?
+
+ */
+
+const minimumArrayLength = function(nums) {
+    if (nums.length < 2) {return nums.length;}
+    let current = nums.slice();
+    let toAppend = [];
+    let toRemove = [];
+    let zeroesAllowed = false;
+    let swapsMade = false;
+    let first = 0;
+    let second;
+    while (true) {
+        for (let i = 0; i < nums.length; i++) {
+            let cur = nums[first];
+            if (!cur) {
+                first++;
+                continue;
+            }
+            if (i == first) {continue;}
+            second = i;
+            if (!nums[second]) {continue;}
+            if (!zeroesAllowed && nums[second] % cur !== 0 || zeroesAllowed) {
+                toRemove.push(first, second);
+                toAppend.push(cur % nums[second]);
+                second = null;
+                first = i + 1;
+                swapsMade = true;
+            }
+        }
+        if (swapsMade) {
+            current = current.filter((e, idx) => !toRemove.includes(idx)).concat(toAppend);
+            toAppend = [];
+            first = 0;
+        } else if (!swapsMade && !zeroesAllowed) {
+            zeroesAllowed = true;
+        } else if (!swapsMade && zeroesAllowed) {
+            break;
+        }
+    }
+    return current.length;
+};
