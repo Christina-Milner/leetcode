@@ -124,3 +124,19 @@ const minimumArrayLength = function(nums) {
     }
     return current.length;
 };
+
+
+//^ Nooope. Decided I wasn't figuring this one out. Based on the top upvoted solution in Python, here's the JS:
+
+function minimumArrayLength(nums) {
+    let min = Math.min(...nums);
+    for (let num of nums) {
+        if (num % min) {
+            return 1;
+        }
+    }
+    return Math.floor((nums.filter(e => e == min).length + 1) / 2)
+}
+
+// I... what? How? Why? Pinging a fellow dev to explain the logic to me.
+
