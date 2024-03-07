@@ -127,4 +127,109 @@ class Solution {
 ```
 
 
+** Triplet Sum to Zero (medium) **
 
+Given an array of unsorted numbers, find all unique triplets in it that add up to zero.
+Not sure how this is two pointers, but I would say go with the tabulation approach.
+Look at first number. Push a subarray with just it in it in the output array.
+Look at second number. Push a subarray with just it in it in the output array, as well as a copy of the one with the first element in it with this one added.
+Repeat for remaining elements, except when a subarray already has 2 elements, only add third one if it fulfills the condition. 
+Filter anything that isn't a triplet at the end.
+This might not give us uniques, though.
+
+class Solution {
+  searchTriplets(arr) {
+    let triplets = [];
+    for (let num of arr) {
+      let nextTriplets = []
+      for (let triplet of triplets) {
+        if (triplet.length == 1 || triplet.length == 2 && triplet[0] + [triplet[1] + num === 0]) {
+          nextTriplets.push([...triplet, num])
+        }
+      }
+      nextTriplets.push([num])
+      triplets = triplets.concat(nextTriplets)
+    }
+    triplets = triplets.filter (e => e.length === 3)
+    return triplets;
+  }
+}
+Nope, no idea.
+Actual solution:
+- Sort input array
+- For each number num in the array, find a pair that adds up to -num
+- The subfunction that does that last part is what uses the two pointers
+- Both function and subfunction ignore duplicate elements
+
+Another attempt based on that pseudocode:
+
+class Solution {
+  searchTriplets(arr) {
+    let triplets = []
+    const sortedCopy = Array.from(new Set(arr.slice().sort((a, b) => a - b)))
+    const findPair = (arr, num) => {
+      let left = 0
+      let right = arr.length - 1
+      while (left < right) {
+        const sum = arr[left] + arr[right]
+        if (sum === num) {
+          return [arr[left], arr[right]]
+        }
+        if (sum > num) {
+          right--
+          continue
+        }
+        else {left++}
+      }
+      return null
+    }
+    for (let i = 0; i < sortedCopy.length; i++) {
+      let cur = sortedCopy[i]
+      let result = findPair(sortedCopy.slice(i + 1), -cur)
+      if (result) {
+        triplets.push([cur, ...result])
+      }
+    }
+    return triplets
+}
+}
+
+*Actual solution*
+
+class Solution {
+  searchTriplets(arr) {
+    arr.sort((a, b) => a - b); // Modifying the input ಠ_ಠ
+    const triplets = [];
+    for (let i = 0; i < arr.length; i++) {
+      // skip same element to avoid duplicate triplets
+      if (i > 0 && arr[i] === arr[i - 1]) { 
+        continue;
+      }
+      this.searchPair(arr, -arr[i], i + 1, triplets);
+    }
+
+    return triplets;
+  }
+
+  searchPair(arr, targetSum, left, triplets) {
+    let right = arr.length - 1;
+    while (left < right) {
+      const currentSum = arr[left] + arr[right];
+      if (currentSum === targetSum) { // found the triplet
+        triplets.push([-targetSum, arr[left], arr[right]]);
+        left += 1;
+        right -= 1;
+        while (left < right && arr[left] === arr[left - 1]) {
+          left += 1; // skip same element to avoid duplicate triplets
+        }
+        while (left < right && arr[right] === arr[right + 1]) {
+          right -= 1; // skip same element to avoid duplicate triplets
+        }
+      } else if (targetSum > currentSum) {
+        left += 1; // we need a pair with a bigger sum
+      } else {
+        right -= 1; // we need a pair with a smaller sum
+      }
+    }
+  }
+}
