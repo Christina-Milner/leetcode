@@ -51,7 +51,7 @@ But what, eeven if I get this working with 1000021, if a number with leading zer
 Just adding a line to replace out zeroes at the top because nothing's stopping me from getting rid of them.
 This is the actual solution using numbers only, converted from Python:
 */
-const isPalindrome = function(x) {
+const isPalindrome2 = function(x) {
     if (x < 0 || x !== 0 && x % 10 == 0) {
         return false;
     }
@@ -64,3 +64,33 @@ const isPalindrome = function(x) {
 };
 
 /* ... annd that takes me from "beats 5%" to "beats 99%". Amazing. I had the general idea of "it's to do with 10s and modulos", but failed to implement it correctly. */
+
+/* Happened to be discussing code with someone and it occurred to me how to fix my recursive approach. It's cumbersome and not a good solution to this problem,
+but it's fixable (just keep comparing to the powers of 10 to detect leading zeroes that went bye bye): */
+
+const isPalindrome3 = function(x) {
+    // A minus at the start always means no palindrome
+    if (x < 0) { return false }
+    // A single digit always is a palindrome
+    if (x < 10 ) { return true }
+    // Find the highest power of 10 that fits into the number
+    let pow = 0
+    while (10 ** pow < x) {
+        pow++
+    }
+    if (10 ** pow > x) {pow--}
+    // Integer division by that power of 10 and modulo 10 get us the first and last digit, for comparison 
+    if (Math.floor(x / 10 ** pow) !== x % 10) { return false }
+    let potentialNewNum = Math.floor((x % (10 ** pow)) / 10)
+    // Did removing the first digit take us to a bunch of leading zeroes?
+    pow -= 2
+    while (10 ** pow > potentialNewNum) {
+        if (potentialNewNum % 10 !== 0) {
+            return false
+        }
+        potentialNewNum = Math.floor(potentialNewNum / 10)
+        pow -= 2
+    }
+    // Get rid of the digits we just checked and recursively call function on what remains
+    return isPalindrome(potentialNewNum)
+};
