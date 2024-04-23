@@ -54,3 +54,43 @@ function maxSum(nums) {
     const maxSum = Object.values(digitMap).filter(e => e.length == 2).reduce((acc, cur) => cur[0] + cur[1] > acc ? cur[0] + cur[1] : acc, 0)
     return maxSum || -1
 };
+
+/* I get the nagging feeling that OR in the return shouldn't work because what if the array is [-45, 45, 9, 6] or something? Max sum would be 0, but this
+would return -1. Desc did not say the numbers are all positive. So refactored to this: */
+
+function maxSum(nums) {
+    const maxDigit = num => {
+        let max = 0
+        num = Math.abs(num)
+        while (num >= 10) {
+            let digit = num % 10
+            if (digit > max) {
+                max = digit
+            }
+            num = Math.floor(num / 10)
+        }
+        if (num > max) { max = num}
+        return max
+    }
+
+    let digitMap = {}
+
+    for (let num of nums) {
+        const max = maxDigit(num)
+        if (!(max in digitMap)) {
+            digitMap[max] = [num]
+        }
+        else if (digitMap[max].length < 2) {
+            digitMap[max].push(num)
+        }
+        else {
+            let [bigger, smaller] = [Math.max(...digitMap[max]), Math.min(...digitMap[max])]
+            if (num >= smaller) {
+                digitMap[max] = [num, bigger]
+            } 
+        }
+    }
+    const pairs = Object.values(digitMap).filter(e => e.length == 2)
+    if (!pairs.length) {return -1}
+    return pairs.reduce((acc, cur) => cur[0] + cur[1] > acc ? cur[0] + cur[1] : acc, 0)
+};
